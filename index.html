@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WisdomVerse</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+html,body{
+height:100%;
+overflow:hidden;
+font-family:'Segoe UI',sans-serif;
+}
+
+body{
+animation:sky 30s linear infinite;
+}
+
+@keyframes sky{
+0%,15%{background:#6ec6ff;}
+25%{background:#8fd3ff;}
+35%{background:#5b6ee1;}
+50%{background:#07173f;}
+70%{background:#020b24;}
+85%{background:#ff8f70;}
+100%{background:#6ec6ff;}
+}
+
+#sun,#moon{
+position:absolute;
+border-radius:50%;
+}
+
+#sun{
+width:90px;
+height:90px;
+background:#ffd54f;
+left:-120px;
+top:90px;
+box-shadow:0 0 50px #ffd54f;
+animation:sun 30s linear infinite;
+}
+
+#moon{
+width:70px;
+height:70px;
+background:#eee;
+right:-100px;
+top:120px;
+box-shadow:0 0 30px #fff;
+animation:moon 30s linear infinite;
+}
+
+@keyframes sun{
+0%{left:-120px;}
+50%{left:110%;}
+100%{left:-120px;}
+}
+
+@keyframes moon{
+0%,45%{opacity:0;}
+50%{opacity:1;right:-100px;}
+100%{opacity:1;right:110%;}
+}
+
+.cloud{
+position:absolute;
+width:180px;
+height:60px;
+background:white;
+border-radius:40px;
+opacity:.8;
+}
+
+.cloud:before,
+.cloud:after{
+content:"";
+position:absolute;
+background:white;
+border-radius:50%;
+}
+
+.cloud:before{
+width:70px;
+height:70px;
+left:20px;
+top:-25px;
+}
+
+.cloud:after{
+width:90px;
+height:90px;
+right:20px;
+top:-40px;
+}
+
+.c1{
+top:80px;
+animation:cloud 25s linear infinite;
+}
+
+.c2{
+top:180px;
+animation:cloud 35s linear infinite;
+}
+
+@keyframes cloud{
+from{left:-250px;}
+to{left:110%;}
+}
+
+.rain{
+position:absolute;
+inset:0;
+opacity:0;
+animation:rainshow 30s linear infinite;
+}
+
+@keyframes rainshow{
+0%,25%,55%,100%{opacity:0;}
+30%,50%{opacity:1;}
+}
+
+.drop{
+position:absolute;
+width:2px;
+height:18px;
+background:#bde;
+animation:fall 1s linear infinite;
+}
+
+@keyframes fall{
+from{transform:translateY(-100vh);}
+to{transform:translateY(100vh);}
+}
+
+.star{
+position:absolute;
+width:3px;
+height:3px;
+background:white;
+border-radius:50%;
+animation:twinkle 1.5s infinite alternate;
+}
+
+@keyframes twinkle{
+from{opacity:.2;}
+to{opacity:1;}
+}
+
+#rainbow{
+position:absolute;
+width:300px;
+height:150px;
+border:12px solid transparent;
+border-top-color:red;
+border-radius:300px 300px 0 0;
+left:50%;
+transform:translateX(-50%);
+bottom:120px;
+opacity:0;
+animation:rb 30s linear infinite;
+}
+
+@keyframes rb{
+52%,60%{opacity:1;}
+0%,51%,61%,100%{opacity:0;}
+}
+
+.card{
+position:absolute;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%);
+
+width:450px;
+max-width:90%;
+
+background:rgba(255,255,255,.15);
+
+backdrop-filter:blur(15px);
+
+border:1px solid rgba(255,255,255,.25);
+
+border-radius:25px;
+
+padding:30px;
+
+text-align:center;
+
+color:white;
+
+box-shadow:0 8px 32px rgba(0,0,0,.25);
+}
+
+.card img{
+width:150px;
+height:150px;
+object-fit:cover;
+border-radius:50%;
+border:4px solid rgb(75, 60, 156);
+margin-bottom:15px;
+}
+
+.card h2{
+margin-bottom:10px;
+}
+
+.card p{
+margin-bottom:10px;
+line-height:1.5;
+}
+
+button{
+padding:12px 20px;
+border:none;
+border-radius:12px;
+cursor:pointer;
+font-size:16px;
+font-weight:bold;
+margin-top:10px;
+}
+#name{
+    color:#f10505;
+}
+
+#quote{
+    color:#f7f302;
+    font-weight:500;
+}
+
+.quote-buttons{
+    display:flex;
+    justify-content:center;
+    gap:25px;
+    margin:15px 0;
+}
+
+.quote-buttons button{
+    padding:9px 14px;
+    font-size:13px;
+    font-weight:600;
+    background:#982a2a;
+    color:white;
+    border:none;
+    border-radius:20px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.quote-buttons button:hover{
+    background:#1e3c72;
+    transform:translateY(-2px);
+}
+</style>
+</head>
+
+<body>
+
+<div id="sun"></div>
+<div id="moon"></div>
+
+<div class="cloud c1"></div>
+<div class="cloud c2"></div>
+
+<div id="rainbow"></div>
+
+<div class="rain" id="rain"></div>
+
+<div class="card">
+
+<img id="image">
+
+<h2 id="name">Loading...</h2>
+
+<p id="category"></p>
+
+<p id="quote"></p>
+
+<div class="quote-buttons">
+    <button onclick="previousQuote()">◀ Previous</button>
+    <button onclick="nextQuote()">Next ▶</button>
+</div>
+<hr>
+
+<h3>Comments</h3>
+
+<input
+id="username"
+placeholder="Your Name">
+
+<br><br>
+
+<textarea
+id="comment"
+placeholder="Write Comment">
+</textarea>
+
+<br><br>
+<button class="comment-btn" onclick="submitComment()">
+    Submit Comment
+</button>
+
+<div id="commentList"></div>
+</div>
+
+<script>
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycbwplA3LKmgevR1jzLNb5jhhoTSvCc-CpMOlAUXTlPf6dCQJm4qb1Y8pgVYgUZcOcWTR/exec";
+
+let quotes=[];
+let current=0;
+
+async function loadQuotes(){
+
+try{
+
+const response =
+await fetch(API_URL);
+
+quotes =
+await response.json();
+
+console.log(quotes);
+
+if(quotes.length>0){
+showQuote();
+}
+
+}catch(error){
+
+console.error(error);
+
+alert("API Error");
+}
+}
+
+function showQuote(){
+
+document.getElementById("name").innerText =
+quotes[current].NAME;
+
+document.getElementById("quote").innerText =
+quotes[current].QUOTE;
+
+document.getElementById("category").innerText =
+quotes[current].CATEGORY;
+
+document.getElementById("image").src =
+quotes[current].IMAGE;
+}
+
+function nextQuote(){
+
+current++;
+
+if(current>=quotes.length){
+current=0;
+}
+
+showQuote();
+}
+
+function previousQuote(){
+
+current--;
+
+if(current < 0){
+current = quotes.length - 1;
+}
+
+showQuote();
+}
+
+
+async function submitComment() {
+
+    const user = document.getElementById("username").value.trim();
+    const comment = document.getElementById("comment").value.trim();
+
+    if (!user || !comment) {
+        alert("Name এবং Comment লিখুন");
+        return;
+    }
+
+    try {
+
+        const response = await fetch(API_URL, {
+            method: "POST",
+            redirect: "follow",
+            body: JSON.stringify({
+                quoteId: quotes[current].ID,
+                user,
+                comment
+            })
+        });
+
+        const text = await response.text();
+
+        console.log("STATUS:", response.status);
+        console.log("RESPONSE:", text);
+
+        if (response.ok) {
+
+            // Success হলে field clear হবে
+            document.getElementById("username").value = "";
+            document.getElementById("comment").value = "";
+
+            alert("Comment Saved Successfully");
+
+        } else {
+
+            alert("Comment Save Failed");
+
+        }
+
+    } catch (error) {
+
+        console.error("FETCH ERROR:", error);
+        alert("Comment Save Failed");
+
+    }
+}
+loadQuotes();
+
+const rain=document.getElementById("rain");
+
+for(let i=0;i<180;i++){
+
+let d=document.createElement("div");
+
+d.className="drop";
+
+d.style.left=Math.random()*100+"%";
+
+d.style.animationDelay=Math.random()+"s";
+
+d.style.animationDuration=
+(0.7+Math.random())+"s";
+
+rain.appendChild(d);
+}
+
+for(let i=0;i<120;i++){
+
+let s=document.createElement("div");
+
+s.className="star";
+
+s.style.left=Math.random()*100+"%";
+
+s.style.top=Math.random()*60+"%";
+
+document.body.appendChild(s);
+}
+
+setInterval(()=>{
+
+const t=(Date.now()/1000)%30;
+
+document.querySelectorAll('.star')
+.forEach(st=>{
+
+st.style.opacity=
+(t>15&&t<28)?1:0;
+
+});
+
+},500);
+
+</script>
+
+</body>
+</html>
