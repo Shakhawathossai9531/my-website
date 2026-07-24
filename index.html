@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WisdomVerse</title>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 
 *{
@@ -219,7 +219,7 @@ line-height:1.5;
 }
 
 button{
-padding:12px 20px;
+padding:6px 20px;
 border:none;
 border-radius:12px;
 cursor:pointer;
@@ -227,6 +227,7 @@ font-size:16px;
 font-weight:bold;
 margin-top:10px;
 }
+
 #name{
     color:#f10505;
 }
@@ -303,11 +304,31 @@ id="comment"
 placeholder="Write Comment">
 </textarea>
 
-<br><br>
+<br>
 <button class="comment-btn" onclick="submitComment()">
     Submit Comment
 </button>
+<div style="margin-top:15px; display:flex; justify-content:center; gap:10px;">
 
+<button onclick="likeQuote()">
+    <i class="fa-solid fa-thumbs-up"></i>
+    Like (<span id="likeCount">0</span>)
+</button>
+
+<button onclick="sharePage()">
+    <i class="fa-solid fa-share"></i> Share
+</button>
+
+<a href="https://www.facebook.com/shakhawat.hossaon.3"
+target="_blank">
+
+<button>
+<i class="fa-brands fa-facebook"></i> Facebook
+</button>
+
+</a>
+
+</div>
 <div id="commentList"></div>
 </div>
 
@@ -356,8 +377,31 @@ quotes[current].CATEGORY;
 
 document.getElementById("image").src =
 quotes[current].IMAGE;
+
+loadLikeCount(quotes[current].ID); // ✅ এখানে
+
 }
 
+async function loadLikeCount(quoteId){
+
+    try{
+
+        const response = await fetch(
+            API_URL + "?action=getLikes&quoteId=" + quoteId
+        );
+
+        const data = await response.json();
+
+        document.getElementById("likeCount").innerText =
+            data.likes || 0;
+
+    }catch(error){
+
+        console.error(error);
+
+        document.getElementById("likeCount").innerText = 0;
+    }
+}
 function nextQuote(){
 
 current++;
@@ -379,6 +423,48 @@ current = quotes.length - 1;
 
 showQuote();
 }
+
+
+
+  async function likeQuote() {
+
+    try {
+
+        const response = await fetch(API_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "like",
+                quoteId: quotes[current].ID
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+
+            let count = Number(
+                document.getElementById("likeCount").innerText
+            );
+
+            document.getElementById("likeCount").innerText =
+                count + 1;
+
+        } else {
+
+            alert("Like Failed");
+
+        }
+
+    } catch(error) {
+
+        console.error(error);
+        alert("Like Failed");
+
+    }
+} 
+
+
+
 
 
 async function submitComment() {
@@ -430,7 +516,22 @@ async function submitComment() {
     }
 }
 loadQuotes();
+function sharePage(){
 
+    if(navigator.share){
+
+        navigator.share({
+            title: document.getElementById("name").innerText,
+            text: document.getElementById("quote").innerText,
+            url: window.location.href
+        });
+
+    }else{
+
+        navigator.clipboard.writeText(window.location.href);
+        alert("Link Copied");
+    }
+}
 const rain=document.getElementById("rain");
 
 for(let i=0;i<180;i++){
