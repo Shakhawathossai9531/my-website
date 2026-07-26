@@ -401,3 +401,282 @@ console.log(quotes);
 if(quotes.length>0){
 showQuote();
 }
+
+}catch(error){
+
+console.error(error);
+
+alert("API Error");
+}
+}
+
+function showQuote(){
+
+document.getElementById("name").innerText =
+quotes[current].NAME;
+
+document.getElementById("quote").innerText =
+quotes[current].QUOTE;
+
+document.getElementById("Designation").innerText =
+quotes[current].DESIGNATION;
+
+document.getElementById("image").src =
+quotes[current].IMAGE;
+
+loadLikeCount(quotes[current].ID); // ✅ এখানে
+
+}
+
+async function loadLikeCount(quoteId){
+
+    try{
+
+        const response = await fetch(
+            API_URL + "?action=getLikes&quoteId=" + quoteId
+        );
+
+        const data = await response.json();
+
+        document.getElementById("likeCount").innerText =
+            data.likes || 0;
+
+    }catch(error){
+
+        console.error(error);
+
+        document.getElementById("likeCount").innerText = 0;
+    }
+}
+function nextQuote(){
+
+current++;
+
+if(current>=quotes.length){
+current=0;
+}
+
+showQuote();
+}
+
+function previousQuote(){
+
+current--;
+
+if(current < 0){
+current = quotes.length - 1;
+}
+
+showQuote();
+}
+
+
+
+  async function likeQuote() {
+
+    try {
+
+        const response = await fetch(API_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "like",
+                quoteId: quotes[current].ID
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+
+            let count = Number(
+                document.getElementById("likeCount").innerText
+            );
+
+            document.getElementById("likeCount").innerText =
+                count + 1;
+
+        } else {
+
+            alert("Like Failed");
+
+        }
+
+    } catch(error) {
+
+        console.error(error);
+        alert("Like Failed");
+
+    }
+} 
+
+
+function searchQuote() {
+
+    const keyword =
+        document.getElementById("searchBox")
+        .value
+        .toLowerCase();
+
+    if (!keyword) {
+        current = 0;
+        showQuote();
+        return;
+    }
+
+    const index = quotes.findIndex(q =>
+        q.QUOTE.toLowerCase().includes(keyword) ||
+        q.NAME.toLowerCase().includes(keyword)
+    );
+
+    if (index !== -1) {
+        current = index;
+        showQuote();
+    }
+}
+
+
+async function submitComment() {
+
+    const user = document.getElementById("username").value.trim();
+    const comment = document.getElementById("comment").value.trim();
+
+    if (!user || !comment) {
+        alert("Name এবং Comment লিখুন");
+        return;
+    }
+
+    try {
+
+        const response = await fetch(API_URL, {
+            method: "POST",
+            redirect: "follow",
+            body: JSON.stringify({
+                quoteId: quotes[current].ID,
+                user,
+                comment
+            })
+        });
+
+        const text = await response.text();
+
+        console.log("STATUS:", response.status);
+        console.log("RESPONSE:", text);
+
+        if (response.ok) {
+
+            // Success হলে field clear হবে
+            document.getElementById("username").value = "";
+            document.getElementById("comment").value = "";
+
+            alert("Comment Saved Successfully");
+
+        } else {
+
+            alert("Comment Save Failed");
+
+        }
+
+    } catch (error) {
+
+        console.error("FETCH ERROR:", error);
+        alert("Comment Save Failed");
+
+    }
+}
+
+loadQuotes();
+
+// Voice লোড করার জন্য
+window.speechSynthesis.onvoiceschanged = () => {
+    speechSynthesis.getVoices();
+};
+
+// 🔊 Listen Function
+function readQuote() {
+
+    const text = document.getElementById("quote").innerText.trim();
+
+    if (!text) return;
+
+    speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    const isBangla = /[\u0980-\u09FF]/.test(text);
+
+    utterance.lang = isBangla ? "bn-BD" : "en-US";
+    
+// একটু বেশি natural শোনাবে
+    utterance.rate = 0.85;
+    utterance.pitch = 1.2;
+    utterance.volume = 1;
+
+    speechSynthesis.speak(utterance);
+}
+
+
+   function sharePage(){
+
+    if(navigator.share){
+
+        navigator.share({
+            title: document.getElementById("name").innerText,
+            text: document.getElementById("quote").innerText,
+            url: window.location.href
+        });
+
+    }else{
+
+        navigator.clipboard.writeText(window.location.href);
+        alert("Link Copied");
+    }
+}
+const rain=document.getElementById("rain");
+
+for(let i=0;i<180;i++){
+
+let d=document.createElement("div");
+
+d.className="drop";
+
+d.style.left=Math.random()*100+"%";
+
+d.style.animationDelay=Math.random()+"s";
+
+d.style.animationDuration=
+(0.7+Math.random())+"s";
+
+rain.appendChild(d);
+}
+
+for(let i=0;i<120;i++){
+
+let s=document.createElement("div");
+
+s.className="star";
+
+s.style.left=Math.random()*100+"%";
+
+s.style.top=Math.random()*60+"%";
+
+document.body.appendChild(s);
+}
+
+setInterval(()=>{
+
+const t=(Date.now()/1000)%30;
+
+document.querySelectorAll('.star')
+.forEach(st=>{
+
+st.style.opacity=
+(t>15&&t<28)?1:0;
+
+});
+
+},500);
+
+</script>
+
+</body>
+</html>
