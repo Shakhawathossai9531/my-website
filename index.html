@@ -195,53 +195,60 @@ padding:30px;
 
 text-align:center;
 
-color:white;
+color:rgb(249, 253, 7);
 
 box-shadow:0 8px 32px rgba(0,0,0,.25);
 }
 
 .card img{
-width:150px;
-height:150px;
-object-fit:cover;
-border-radius:50%;
-border:4px solid rgb(75, 60, 156);
-margin-bottom:15px;
+    width:150px;
+    height:150px;
+    object-fit:cover;
+    border-radius:50%;
+    border:4px solid rgb(75, 60, 156);
+    margin-top:-10px;
+    margin-bottom:8px;
 }
 
 .card h2{
-margin-bottom:10px;
+margin-bottom:0px;
 }
 
 .card p{
-margin-bottom:10px;
+margin-bottom:5px;
 line-height:1.5;
 }
 
 button{
-padding:6px 20px;
-border:none;
-border-radius:12px;
-cursor:pointer;
-font-size:16px;
-font-weight:bold;
-margin-top:10px;
+    padding:6px 20px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:bold;
+    margin-top:0px;
 }
 
 #name{
-    color:#f10505;
+    color:#fffefe;
+    margin-top:-15px;
 }
 
 #quote{
-    color:#f7f302;
-    font-weight:500;
+
+    color: #ffffff;
+
+    font-weight: 500;
+
+    font-size: 22px; /* প্রয়োজন অনুযায়ী বাড়াতে পারেন */
+
 }
 
 .quote-buttons{
     display:flex;
     justify-content:center;
     gap:25px;
-    margin:15px 0;
+    margin:3px 0;
 }
 
 .quote-buttons button{
@@ -251,7 +258,7 @@ margin-top:10px;
     background:#982a2a;
     color:white;
     border:none;
-    border-radius:20px;
+    border-radius:15px;
     cursor:pointer;
     transition:.3s;
 }
@@ -260,9 +267,33 @@ margin-top:10px;
     background:#1e3c72;
     transform:translateY(-2px);
 }
+.comment-title{
+    margin-bottom:8px;
+}
+
+#username{
+    display:block;
+    margin:0 auto 5px auto;
+    padding:3px;
+    width:50%;
+    border-radius:3px;
+    border:none;
+}
+
+#comment{
+    display:block;
+    margin:0 auto;
+    padding:5px;
+    width:50%;
+    height:50px;
+    border-radius:8px;
+    border:none;
+}
+.comment-btn{
+    margin-top: 5px;
+}
 </style>
 </head>
-
 <body>
 
 <div id="sun"></div>
@@ -287,24 +318,39 @@ margin-top:10px;
 
 <div class="quote-buttons">
     <button onclick="previousQuote()">◀ Previous</button>
-    <button onclick="nextQuote()">Next ▶</button>
+    <button id="listenBtn" onclick="readQuote()">
+        🔊 Listen
+    </button>
+
+<button onclick="nextQuote()">Next ▶</button>
+
+
 </div>
+<input
+    type="text"
+    id="searchBox"
+    placeholder="🔍 Search Quotes..."
+    onkeyup="searchQuote()"
+    style="
+        width:100%;
+        padding:5px;
+        border-radius:5px;
+        border:none;
+        margin-bottom:5px;
+    ">
 <hr>
 
-<h3>Comments</h3>
+<h3 class="comment-title">Comments</h3>
 
 <input
 id="username"
 placeholder="Your Name">
-
-<br><br>
 
 <textarea
 id="comment"
 placeholder="Write Comment">
 </textarea>
 
-<br>
 <button class="comment-btn" onclick="submitComment()">
     Submit Comment
 </button>
@@ -464,7 +510,29 @@ showQuote();
 } 
 
 
+function searchQuote() {
 
+    const keyword =
+        document.getElementById("searchBox")
+        .value
+        .toLowerCase();
+
+    if (!keyword) {
+        current = 0;
+        showQuote();
+        return;
+    }
+
+    const index = quotes.findIndex(q =>
+        q.QUOTE.toLowerCase().includes(keyword) ||
+        q.NAME.toLowerCase().includes(keyword)
+    );
+
+    if (index !== -1) {
+        current = index;
+        showQuote();
+    }
+}
 
 
 async function submitComment() {
@@ -515,25 +583,39 @@ async function submitComment() {
 
     }
 }
+
 loadQuotes();
-function sharePage(){
 
-    if(navigator.share){
+// Voice লোড করার জন্য
+window.speechSynthesis.onvoiceschanged = () => {
+    speechSynthesis.getVoices();
+};
 
-        navigator.share({
-            title: document.getElementById("name").innerText,
-            text: document.getElementById("quote").innerText,
-            url: window.location.href
-        });
+// 🔊 Listen Function
+function readQuote() {
 
-    }else{
+    const text = document.getElementById("quote").innerText.trim();
 
-        navigator.clipboard.writeText(window.location.href);
-        alert("Link Copied");
-    }
+    if (!text) return;
+
+    speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    const isBangla = /[\u0980-\u09FF]/.test(text);
+
+    utterance.lang = isBangla ? "bn-BD" : "en-US";
+    
+// একটু বেশি natural শোনাবে
+    utterance.rate = 0.85;
+    utterance.pitch = 1.2;
+    utterance.volume = 1;
+
+    speechSynthesis.speak(utterance);
 }
-const rain=document.getElementById("rain");
 
+
+   const rain=document.getElementById("rain");   
 for(let i=0;i<180;i++){
 
 let d=document.createElement("div");
