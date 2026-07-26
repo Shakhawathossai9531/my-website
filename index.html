@@ -236,7 +236,7 @@ button{
 
 #quote{
 
-   color: #ff0000;
+    color: #ff0000;
 
     font-weight: 500;
 
@@ -615,7 +615,24 @@ function readQuote() {
 }
 
 
-   const rain=document.getElementById("rain");   
+   function sharePage(){
+
+    if(navigator.share){
+
+        navigator.share({
+            title: document.getElementById("name").innerText,
+            text: document.getElementById("quote").innerText,
+            url: window.location.href
+        });
+
+    }else{
+
+        navigator.clipboard.writeText(window.location.href);
+        alert("Link Copied");
+    }
+}
+const rain=document.getElementById("rain");
+
 for(let i=0;i<180;i++){
 
 let d=document.createElement("div");
