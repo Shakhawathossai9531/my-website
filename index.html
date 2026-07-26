@@ -586,39 +586,53 @@ async function submitComment() {
 
 loadQuotes();
 
-// Voice লোড করার জন্য
-window.speechSynthesis.onvoiceschanged = () => {
-    speechSynthesis.getVoices();
-};
+/function speakText(text, lang) {
+    return new Promise((resolve) => {
+        const utterance = new SpeechSynthesisUtterance(text);
 
-function readQuote() {
+        utterance.lang = lang;
+
+        const voices = speechSynthesis.getVoices();
+
+        if (lang === "bn-BD") {
+            const voice = voices.find(v => v.lang.startsWith("bn"));
+            if (voice) utterance.voice = voice;
+        } else {
+            const voice = voices.find(v => v.lang.startsWith("en"));
+            if (voice) utterance.voice = voice;
+        }
+
+        utterance.rate = 0.9;
+
+        utterance.onend = resolve;
+
+        speechSynthesis.speak(utterance);
+    });
+}
+
+async function readQuote() {
     const text = document.getElementById("quote").innerText.trim();
     if (!text) return;
 
     speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    const isBangla = /[\u0980-\u09FF]/.test(text);
+    // বাংলা ও ইংরেজি অংশ আলাদা করা
+    const parts = text.match(/[\u0980-\u09FF\s.,!?;:'"()]+|[A-Za-z0-9\s.,!?;:'"()]+/g);
 
-    utterance.lang = isBangla ? "bn-BD" : "en-US";
+    if (!parts) return;
 
-    const voices = speechSynthesis.getVoices();
+    for (const part of parts) {
+        const cleanPart = part.trim();
+        if (!cleanPart) continue;
 
-    if (isBangla) {
-        const banglaVoice = voices.find(v =>
-            v.lang.startsWith("bn")
+        const isBangla = /[\u0980-\u09FF]/.test(cleanPart);
+
+        await speakText(
+            cleanPart,
+            isBangla ? "bn-BD" : "en-US"
         );
-
-        if (banglaVoice) {
-            utterance.voice = banglaVoice;
-        }
     }
-
-    utterance.rate = 0.85;
-    utterance.pitch = 1.0;
-    utterance.volume = 1;
-
-    speechSynthesis.speak(utterance);
+}
 }
    function sharePage(){
 
